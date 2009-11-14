@@ -1,3 +1,9 @@
+# Capcake capistrano's recipe
+#
+# Author::    Jad Bitar (mailto:jad@wdtmedia.net)
+# Copyright:: Copyright (c) 2005-2009, WDT Media Corp (http://wdtmedia.net)
+# License::   http://opensource.org/licenses/bsd-license.php The BSD License
+
 Capistrano::Configuration.instance(:must_exist).load do
 
   require 'capistrano/recipes/deploy/scm'

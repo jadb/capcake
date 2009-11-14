@@ -1,3 +1,9 @@
+# Capcake Rakefile
+#
+# Author::    Jad Bitar (mailto:jad@wdtmedia.net)
+# Copyright:: Copyright (c) 2005-2009, WDT Media Corp (http://wdtmedia.net)
+# License::   http://opensource.org/licenses/bsd-license.php The BSD License
+
 require 'rubygems'
 require 'rake'
 
