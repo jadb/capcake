@@ -9,32 +9,18 @@ Capistrano::Configuration.instance(:must_exist).load do
   require 'capistrano/recipes/deploy/scm'
   require 'capistrano/recipes/deploy/strategy'
 
-  def _cset(name, *args, &block)
-    unless exists?(name)
-      set(name, *args, &block)
-    end
-  end
-
-  # =========================================================================
-  # These variables MUST be set in the client capfiles. If they are not set,
-  # the deploy will fail with an error.
-  # =========================================================================
-
-  _cset(:application) { abort "Please specify the name of your application, set :application, 'foo'" }
-  _cset(:repository)  { abort "Please specify the repository that houses your application's code, set :repository, 'foo'" }
-  _cset(:cake_branch) { abort "Please specify the branch/tag of CakePHP your application uses, set :cake_tag, '1.3.0-alpha'" }
-
   # =========================================================================
   # These variables may be set in the client capfile if their default values
   # are not sufficient.
   # =========================================================================
 
-  _cset :branch, "master"
-  _cset :user, "deployer" 
-  _cset :keep_releases, 5
-
-  _cset(:deploy_to) { "/var/www/#{application}" }
-  _cset(:revision)  { source.head }
+  set :application,   ""
+  set :branch,        "master"
+  set :deploy_to,     "/var/www/#{application}"
+  set :keep_releases, 5
+  set :repository,    ""
+  set :use_sudo,      false
+  set :user,          "deployer"
 
   # =========================================================================
   # These variables should NOT be changed unless you are very confident in
@@ -42,119 +28,21 @@ Capistrano::Configuration.instance(:must_exist).load do
   # changes if you do decide to muck with these!
   # =========================================================================
 
-  _cset(:source)            { Capistrano::Deploy::SCM.new(scm, self) }
-  _cset(:real_revision)     { source.local.query_revision(revision) { |cmd| with_env("LC_ALL", "C") { run_locally(cmd) } } }
-
-  _cset(:strategy)          { Capistrano::Deploy::Strategy.new(deploy_via, self) }
-
-  _cset(:release_name)      { set :deploy_timestamped, true; Time.now.utc.strftime("%Y%m%d%H%M%S") }
-
-  _cset :version_dir,       "releases"
-  _cset :shared_dir,        "shared"
-  _cset :shared_children,   %w(tmp)
-  _cset :current_dir,       "current"
-
-  _cset(:releases_path)     { File.join(deploy_to, version_dir) }
-  _cset(:shared_path)       { File.join(deploy_to, shared_dir) }
-  _cset(:current_path)      { File.join(deploy_to, current_dir) }
-  _cset(:release_path)      { File.join(releases_path, release_name) }
-
-  _cset(:releases)          { capture("ls -xt #{releases_path}").split.reverse }
-  _cset(:current_release)   { File.join(releases_path, releases.last) }
-  _cset(:previous_release)  { releases.length > 1 ? File.join(releases_path, releases[-2]) : nil }
-
-  _cset(:current_revision)  { capture("cat #{current_path}/REVISION").chomp }
-  _cset(:latest_revision)   { capture("cat #{current_release}/REVISION").chomp }
-  _cset(:previous_revision) { capture("cat #{previous_release}/REVISION").chomp }
-
-  _cset(:run_method)        { fetch(:use_sudo, true) ? :sudo : :run }
-
-  set :git_flag_quiet,  ""
-
-  set :scm, :git
+  set :scm,                   :git
   set :git_enable_submodules, 1
-  set :deploy_via, :checkout
+  set :revision,              source.head
+  set :deploy_via,            :checkout
+  set :shared_children,       %w(system tmp)
 
-  _cset(:shared_path_tmp) { File.join(shared_path, "tmp") }
+  set :git_flag_quiet,        ""
 
-  _cset(:cake_repo) { "dev@code.cakephp.org:cakephp.git" }
-  _cset(:cake_path) { shared_path }
-
-  # some tasks, like symlink, need to always point at the latest release, but
-  # they can also (occassionally) be called standalone. In the standalone case,
-  # the timestamped release_path will be inaccurate, since the directory won't
-  # actually exist. This variable lets tasks like symlink work either in the
-  # standalone case, or during deployment.
-  _cset(:latest_release) { exists?(:deploy_timestamped) ? release_path : current_release }
-
-  # =========================================================================
-  # These are helper methods that will be available to your recipes.
-  # =========================================================================
-
-  # Auxiliary helper method for the `deploy:check' task. Lets you set up your
-  # own dependencies.
-  def depend(location, type, *args)
-    deps = fetch(:dependencies, {})
-    deps[location] ||= {}
-    deps[location][type] ||= []
-    deps[location][type] << args
-    set :dependencies, deps
-  end
-
-  # Temporarily sets an environment variable, yields to a block, and restores
-  # the value when it is done.
-  def with_env(name, value)
-    saved, ENV[name] = ENV[name], value
-    yield
-  ensure
-    ENV[name] = saved
-  end
-
-  # logs the command then executes it locally.
-  # returns the command output as a string
-  def run_locally(cmd)
-    logger.trace "executing locally: #{cmd.inspect}" if logger
-    `#{cmd}`
-  end
-
-  # If a command is given, this will try to execute the given command, as
-  # described below. Otherwise, it will return a string for use in embedding in
-  # another command, for executing that command as described below.
-  #
-  # If :run_method is :sudo (or :use_sudo is true), this executes the given command
-  # via +sudo+. Otherwise is uses +run+. If :as is given as a key, it will be
-  # passed as the user to sudo as, if using sudo. If the :as key is not given,
-  # it will default to whatever the value of the :admin_runner variable is,
-  # which (by default) is unset.
-  #
-  # THUS, if you want to try to run something via sudo, and what to use the
-  # root user, you'd just to try_sudo('something'). If you wanted to try_sudo as
-  # someone else, you'd just do try_sudo('something', :as => "bob"). If you
-  # always wanted sudo to run as a particular user, you could do 
-  # set(:admin_runner, "bob").
-  def try_sudo(*args)
-    options = args.last.is_a?(Hash) ? args.pop : {}
-    command = args.shift
-    raise ArgumentError, "too many arguments" if args.any?
-
-    as = options.fetch(:as, fetch(:admin_runner, nil))
-    via = fetch(:run_method, :sudo)
-    if command
-      invoke_command(command, :via => via, :as => as)
-    elsif via == :sudo
-      sudo(:as => as)
-    else
-      ""
-    end
-  end
-
-  # Same as sudo, but tries sudo with :as set to the value of the :runner
-  # variable (which defaults to "app").
-  def try_runner(*args)
-    options = args.last.is_a?(Hash) ? args.pop : {}
-    args << options.merge(:as => fetch(:runner, "app"))
-    try_sudo(*args)
-  end
+  _cset(:cake_branch)         { "" }
+  _cset(:cake_path)           { shared_path }
+  _cset(:cake_repo)           { "dev@code.cakephp.org:cakephp.git" }
+  _cset(:tmp_path)            { File.join(shared_path, "tmp") }
+  _cset(:cache_path)          { File.join(tmp_path, "cache") }
+  _cset :tmp_children,        %w(cache logs sessions tests)
+  _cset :cache_children,      %w(models persistent views)
 
   # =========================================================================
   # These are the tasks that are available to help with deploying web apps,
