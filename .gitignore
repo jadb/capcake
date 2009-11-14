@@ -1,3 +1,2 @@
-.gem
-.gemspec
+*.gem*
 pkg/*
