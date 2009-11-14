@@ -1,6 +1,6 @@
 # Capcake capistrano's recipe
 #
-# Author::    Jad Bitar (mailto:jad@wdtmedia.net)
+# Author::    Jad Bitar (mailto:jadbitar@mac.com)
 # Copyright:: Copyright (c) 2005-2009, WDT Media Corp (http://wdtmedia.net)
 # License::   http://opensource.org/licenses/bsd-license.php The BSD License
 

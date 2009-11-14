@@ -1,6 +1,6 @@
 # Capcake Rakefile
 #
-# Author::    Jad Bitar (mailto:jad@wdtmedia.net)
+# Author::    Jad Bitar (mailto:jadbitar@mac.com)
 # Copyright:: Copyright (c) 2005-2009, WDT Media Corp (http://wdtmedia.net)
 # License::   http://opensource.org/licenses/bsd-license.php The BSD License
 
@@ -13,7 +13,7 @@ begin
     gem.name = "capcake"
     gem.summary = ""
     gem.description = ""
-    gem.email = "jad@wdtmedia.net"
+    gem.email = "jadbitar@mac.com"
     gem.homepage = ""
     gem.author = "Jad Bitar"
     gem.add_dependency "capistrano", ">= 2.5"
