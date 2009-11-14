@@ -11,10 +11,10 @@ begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
     gem.name = "capcake"
-    gem.summary = ""
-    gem.description = ""
+    gem.summary = "Deploy CakePHP applications using Capistrano"
+    gem.description = "Deploy CakePHP applications using Capistrano"
     gem.email = "jadbitar@mac.com"
-    gem.homepage = ""
+    gem.homepage = "http://github.com/jadb/capcake"
     gem.author = "Jad Bitar"
     gem.add_dependency "capistrano", ">= 2.5"
     gem.files = FileList["lib/**/*"].to_a
