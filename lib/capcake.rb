@@ -379,6 +379,21 @@ Capistrano::Configuration.instance(:must_exist).load do
       end
     end
 
+    desc <<-DESC
+      Quick server(s) reset. For now, it deletes all files/folders in :deploy_to \
+      (This is still an experimental feature, and is subject to change without \
+      notice!) \
+
+      Used only when first testing setup deploy recipes and want to quickly \
+      reset servers.
+    DESC
+    task :destroy do
+      set(:confirm) do
+        Capistrano::CLI.ui.ask "This will delete your project on all servers. Are you sure you wish to continue? [Y/n]"
+      end
+      run "#{try_sudo} rm -rf #{deploy_to}/*" if (confirm == "Y")
+    end
+
   end
 
   namespace :cake do
