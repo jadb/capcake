@@ -40,6 +40,7 @@ Capistrano::Configuration.instance(:must_exist).load do
   _cset(:cake_repo)           { "dev@code.cakephp.org:cakephp.git" }
   _cset :tmp_children,        %w(cache logs sessions tests)
   _cset :cache_children,      %w(models persistent views)
+  _cset :logs_files            %w(debug error)
 
   def capcake()
     set :deploy_to, "/var/www/#{application}" if (deploy_to.empty?)
@@ -47,6 +48,7 @@ Capistrano::Configuration.instance(:must_exist).load do
     _cset(:cake_path)         { shared_path }
     _cset(:tmp_path)          { File.join(shared_path, "tmp") }
     _cset(:cache_path)        { File.join(tmp_path, "cache") }
+    _cset(:logs_path)         { File.join(tmp_path, "logs") }
   end
 
   # =========================================================================
@@ -420,6 +422,33 @@ Capistrano::Configuration.instance(:must_exist).load do
       DESC
       task :clear, :roles => :web, :except => { :no_release => true } do
         run "#{try_sudo} rm #{cache_path}/**/*"
+      end
+    end
+
+    namespace :logs do
+      desc <<-DESC
+        Clears CakePHP's APP/tmp/logs and its sub-directories
+
+        Recursively finds all files in :logs_path and runs `rm -f` on each. If a file \
+        is renamed/removed after it was found but before it removes it, no error \
+        will prompt (-ignore_readdir_race). If symlinks are found, they will not be followed
+
+      DESC
+      task :clear, :roles => :web, :except => { :no_release => true } do
+        run "#{try_sudo} find -P #{logs_path} -ignore_readdir_race -type f -name '*' -exec rm -f {} \\;"
+      end
+      desc <<-DESC
+        Streams the result of `tail -f` on all :logs_files \
+
+        By default, the files are `debug` and `error`. You can add your own \
+        in config/deploy.rb
+
+          set :logs_files %w(debug error my_log_file)
+
+      DESC
+      task :tail, :roles => :web, :except => { :no_release => true } do
+        files = logs_files.map { |d| File.join(logs_path, d) }
+        stream "#{try_sudo} tail -f #{files.join(' ')}"
       end
     end
 
