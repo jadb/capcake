@@ -75,7 +75,9 @@ Capistrano::Configuration.instance(:must_exist).load do
     task :setup, :except => { :no_release => true } do
       dirs = [deploy_to, releases_path, shared_path]
       dirs += shared_children.map { |d| File.join(shared_path, d) }
-      run "#{try_sudo} mkdir -p #{dirs.join(' ')} && #{try_sudo} chmod g+w #{dirs.join(' ')} && chmod -R 777 #{shared_path_tmp}"
+      tmp_dirs = tmp_children.map { |d| File.join(tmp_path, d) }
+      tmp_dirs += cache_children.map { |d| File.join(cache_path, d) }
+      run "#{try_sudo} mkdir -p #{(dirs + tmp_dirs).join(' ')} && #{try_sudo} chmod -R 777 #{tmp_path}" if (!user.empty?)
       set :git_flag_quiet, "-q "
       cake.setup
     end
