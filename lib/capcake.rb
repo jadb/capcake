@@ -293,13 +293,14 @@ Capistrano::Configuration.instance(:must_exist).load do
     end
 
     desc <<-DESC
-      Deploys and starts a `cold' application. This is useful if you have not \
-      deployed your application before, or if your application is (for some \
-      other reason) not currently running. It will deploy the code, run any \
-      pending migrations, and then instead of invoking `deploy:restart', it will \
-      invoke `deploy:start' to fire up the application servers.
+      Deploys and starts a `cold' application. This is useful if you have never \
+      deployed your application before. It currently runs `deploy:setup` followed \
+      by `deploy:update`. \
+      (This is still an experimental feature, and is subject to change without \
+      notice!)
     DESC
     task :cold do
+      setup
       update
     end
 
