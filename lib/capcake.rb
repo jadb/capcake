@@ -16,7 +16,7 @@ Capistrano::Configuration.instance(:must_exist).load do
 
   set :application,   ""
   set :branch,        "master"
-  set :deploy_to,     "/var/www/#{application}"
+  set :deploy_to,     ""
   set :keep_releases, 5
   set :repository,    ""
   set :use_sudo,      false
@@ -37,12 +37,17 @@ Capistrano::Configuration.instance(:must_exist).load do
   set :git_flag_quiet,        ""
 
   _cset(:cake_branch)         { "" }
-  _cset(:cake_path)           { shared_path }
   _cset(:cake_repo)           { "dev@code.cakephp.org:cakephp.git" }
-  _cset(:tmp_path)            { File.join(shared_path, "tmp") }
-  _cset(:cache_path)          { File.join(tmp_path, "cache") }
   _cset :tmp_children,        %w(cache logs sessions tests)
   _cset :cache_children,      %w(models persistent views)
+
+  def capcake()
+    set :deploy_to, "/var/www/#{application}" if (deploy_to.empty?)
+    set(:shared_path)         { File.join(deploy_to, "shared") }
+    _cset(:cake_path)         { shared_path }
+    _cset(:tmp_path)          { File.join(shared_path, "tmp") }
+    _cset(:cache_path)        { File.join(tmp_path, "cache") }
+  end
 
   # =========================================================================
   # These are the tasks that are available to help with deploying web apps,
