@@ -23,7 +23,11 @@ Prepend your config/deploy.rb with the following lines:
 	require 'rubygems'
 	require 'capcake'
 
-You should then be able to proceed as you would usually. To familiarize yourself with the now modified list of tasks, you can get a full list with:
+And make sure you start capcake on the last line of that same file:
+
+	capcake
+
+You should then be able to proceed as you usually would. To familiarize yourself with the now modified list of tasks, you can get a full list with:
 
 	$ cap -T
 
@@ -45,7 +49,7 @@ We need to tell it where to deploy, using what methods:
 
 	server "www.domain.tld", :app, :db, :primary => true
 
-And finally, some CakePHP related settings:
+And finally, some CakePHP related settings (if omitted, Capcake will NOT handle deploying CakePHP):
 
 	set :cake_branch, "1.3.0-alpha"
 
@@ -68,23 +72,28 @@ That should create on your server the following directory structure:
 
 	[deploy_to]
 	[deploy_to]/releases
-	[deploy_to]/releases/20091013001122
-	[deploy_to]/releases/20091013001122/tmp -> [deploy_to]/shared/tmp
-	[deploy_to]/releases/...
 	[deploy_to]/shared
 	[deploy_to]/shared/cakephp
+	[deploy_to]/shared/system
 	[deploy_to]/shared/tmp
-	[deploy_to]/shared/...
-	[deploy_to]/current -> [deploy_to]/releases/20091013001122
 
 Finally, deploy:
 
 	# cap deploy
 
-To get the most up-to-date list of available tasks, run:
+Which will change the directory structure to become:
 
-	# cap -T
+[deploy_to]
+[deploy_to]/current -> [deploy_to]/releases/20091013001122
+[deploy_to]/releases
+[deploy_to]/releases/20091013001122
+[deploy_to]/releases/20091013001122/system -> [deploy_to]/shared/system
+[deploy_to]/releases/20091013001122/tmp -> [deploy_to]/shared/tmp
+[deploy_to]/shared
+[deploy_to]/shared/cakephp
+[deploy_to]/shared/system
+[deploy_to]/shared/tmp
 
 ## Bugs & Feedback
 
-http://github.com/jadb
+http://github.com/jadb/capcake/issues
