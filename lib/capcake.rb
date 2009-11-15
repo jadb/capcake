@@ -417,11 +417,15 @@ Capistrano::Configuration.instance(:must_exist).load do
       desc <<-DESC
         Clears CakePHP's APP/tmp/cache and its sub-directories.
 
+        Recursively finds all files in :cache_path and runs `rm -f` on each. If a file \
+        is renamed/removed after it was found but before it removes it, no error \
+        will prompt (-ignore_readdir_race). If symlinks are found, they will not be followed
+
         You will rarely need to call this task directly; instead, use the `deploy' \
         task (which performs a complete deploy, including `cake:cache:clear')
       DESC
       task :clear, :roles => :web, :except => { :no_release => true } do
-        run "#{try_sudo} rm #{cache_path}/**/*"
+        run "#{try_sudo} find -P #{cache_path} -ignore_readdir_race -type f -name '*' -exec rm -f {} \\;"
       end
     end
 
