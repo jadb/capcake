@@ -79,7 +79,7 @@ Capistrano::Configuration.instance(:must_exist).load do
       tmp_dirs += cache_children.map { |d| File.join(cache_path, d) }
       run "#{try_sudo} mkdir -p #{(dirs + tmp_dirs).join(' ')} && #{try_sudo} chmod -R 777 #{tmp_path}" if (!user.empty?)
       set :git_flag_quiet, "-q "
-      cake.setup
+      cake.setup if (!cake_branch.empty?)
     end
 
     desc <<-DESC
