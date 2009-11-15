@@ -32,7 +32,7 @@ Capistrano::Configuration.instance(:must_exist).load do
   set :git_enable_submodules, 1
   set :revision,              source.head
   set :deploy_via,            :checkout
-  set :shared_children,       %w(system tmp)
+  set :shared_children,       %w(config system tmp)
 
   set :git_flag_quiet,        ""
 
@@ -45,11 +45,20 @@ Capistrano::Configuration.instance(:must_exist).load do
   def capcake()
     set :deploy_to, "/var/www/#{application}" if (deploy_to.empty?)
     set(:current_path)        { File.join(deploy_to, current_dir) }
+    set(:database_path)       { File.join(File.join(shared_path, "config"), "database.php") }
     set(:shared_path)         { File.join(deploy_to, shared_dir) }
     _cset(:cake_path)         { shared_path }
     _cset(:tmp_path)          { File.join(shared_path, "tmp") }
     _cset(:cache_path)        { File.join(tmp_path, "cache") }
     _cset(:logs_path)         { File.join(tmp_path, "logs") }
+
+    after("deploy:setup", "cake:database:config") if (!File.exists?(database_path))
+    after("deploy:symlink", "cake:database:symlink") if (File.exists?(database_path))
+  end
+
+  def defaults(val, default)
+    val = default if (val.empty?)
+    val
   end
 
   # =========================================================================
@@ -446,6 +455,49 @@ Capistrano::Configuration.instance(:must_exist).load do
       DESC
       task :clear, :roles => :web, :except => { :no_release => true } do
         run "#{try_sudo} find -P #{cache_path} -ignore_readdir_race -type f -name '*' -exec rm -f {} \\;"
+      end
+    end
+
+    namespace :database do
+      desc <<-DESC
+        Generates CakePHP database configuration file in #{shared_path}/tmp/system \
+        and symlinks #{current_path}/config/database.php to it
+      DESC
+      task :config, :roles => :web, :except => { :no_release => true } do
+        require 'erb'
+        on_rollback { run "rm #{shared_path}/system/database.php" }
+        puts "Database configuration"
+        _cset :db_host, defaults(Capistrano::CLI.ui.ask("hostname [localhost]:"), 'localhost')
+        _cset :db_login, defaults(Capistrano::CLI.ui.ask("username [#{user}]:"), user)
+        _cset :db_password, Capistrano::CLI.password_prompt("password:")
+        _cset :db_name, defaults(Capistrano::CLI.ui.ask("db name [#{application}]:"), application)
+        _cset :db_prefix, Capistrano::CLI.ui.ask("prefix:")
+        _cset :db_persistent, defaults(Capistrano::CLI.ui.ask("persistent [false]:"), 'false')
+        _cset :db_encoding, defaults(Capistrano::CLI.ui.ask("encoding [utf-8]:"), 'utf-8')
+
+        template = File.read(File.join(File.dirname(__FILE__), "templates", "database.rphp"))
+        result = ERB.new(template).result(binding)
+
+        put(result, "#{database_path}", :mode => 0644, :via => :scp)
+      end
+      desc <<-DESC
+        Creates MySQL database on DB servers
+      DESC
+      task :create, :roles => :db, :except => { :no_releases => true } do
+        # ...
+      end
+      desc <<-DESC
+        Creates database tables on primary DB servers
+      DESC
+      task :schema, :roles => :db, :primary => true, :except => { :no_releases => true } do
+        # ...
+      end
+      desc <<-DESC
+        Creates required CakePHP's APP/config/database.php as a symlink to \
+        #{deploy_to}/shared/config/database.php
+      DESC
+      task :symlink, :roles => :web, :except => { :no_release => true } do
+        run "#{try_sudo} ln -s #{database_path} #{current_path}/config/database.php"
       end
     end
 
