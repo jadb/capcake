@@ -40,7 +40,7 @@ Capistrano::Configuration.instance(:must_exist).load do
   _cset(:cake_repo)           { "dev@code.cakephp.org:cakephp.git" }
   _cset :tmp_children,        %w(cache logs sessions tests)
   _cset :cache_children,      %w(models persistent views)
-  _cset :logs_files            %w(debug error)
+  _cset :logs_files,          %w(debug error)
 
   def capcake()
     set :deploy_to, "/var/www/#{application}" if (deploy_to.empty?)
