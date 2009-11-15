@@ -135,24 +135,25 @@ Capistrano::Configuration.instance(:must_exist).load do
     end
 
     desc <<-DESC
-      Updates the symlink to the most recently deployed version. Capistrano works \
+      Updates the symlinks to the most recently deployed version. Capistrano works \
       by putting each new release of your application in its own directory. When \
-      you deploy a new version, this task's job is to update the `current' symlink \
-      to point at the new version. You will rarely need to call this task \
-      directly; instead, use the `deploy' task (which performs a complete \
-      deploy, including `restart') or the 'update' task (which does everything \
-      except `restart').
+      you deploy a new version, this task's job is to update the `current', \
+      `current/tmp', `current/webroot/system' symlinks to point at the new version. \
+      
+      You will rarely need to call this task directly; instead, use the `deploy' \
+      task (which performs a complete deploy, including `restart') or the 'update' \
+      task (which does everything except `restart').
     DESC
     task :symlink, :except => { :no_release => true } do
       on_rollback do
         if previous_release
-          run "rm -f #{current_path}; ln -s #{previous_release} #{current_path}; true"
+          run "rm -f #{current_path}; ln -s #{previous_release} #{current_path}; ln -s #{shared_path}/system #{current_path}/webroot/system; ln -s #{shared_path}/tmp #{current_path}/tmptrue"
         else
           logger.important "no previous release to rollback to, rollback of symlink skipped"
         end
       end
 
-      run "rm -f #{current_path} && ln -s #{latest_release} #{current_path}"
+      run "rm -f #{current_path} && ln -s #{latest_release} #{current_path} && ln -s #{shared_path}/system #{current_path}/webroot/system && ln -s #{shared_path}/tmp #{current_path}/tmp"
     end
 
     desc <<-DESC
