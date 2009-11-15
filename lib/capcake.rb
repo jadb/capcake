@@ -411,6 +411,16 @@ Capistrano::Configuration.instance(:must_exist).load do
       stream "cd #{cake_path}/cakephp && git checkout #{git_flag_quiet}#{cake_branch}"
     end
 
+    namespace :cache do
+      desc <<-DESC
+        Clears CakePHP's APP/tmp/cache and its sub-directories.
+
+        You will rarely need to call this task directly; instead, use the `deploy' \
+        task (which performs a complete deploy, including `cake:cache:clear')
+      DESC
+      task :clear, :roles => :web, :except => { :no_release => true } do
+        run "#{try_sudo} rm #{cache_path}/**/*"
+      end
     end
 
   end
