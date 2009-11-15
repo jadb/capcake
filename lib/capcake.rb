@@ -390,7 +390,7 @@ Capistrano::Configuration.instance(:must_exist).load do
     DESC
     desc "Prepares server for deployment of a CakePHP application"
     task :setup do
-      run "cd #{cake_path} && git clone #{cake_repo}"
+      stream "cd #{cake_path} && git clone #{cake_repo}"
       set :git_flag_quiet, "-q "
       update
     end
@@ -407,8 +407,10 @@ Capistrano::Configuration.instance(:must_exist).load do
       Further customization will require that you write your own task.
     DESC
     task :update do
-      cake_branch = ENV['BRANCH'] ? ENV['BRANCH'] : cake_branch
-      run "cd #{cake_path}/cakephp && git checkout #{git_flag_quiet}#{cake_branch}"
+      set :cake_branch, ENV['BRANCH'] if ENV.has_key?('BRANCH')
+      stream "cd #{cake_path}/cakephp && git checkout #{git_flag_quiet}#{cake_branch}"
+    end
+
     end
 
   end
