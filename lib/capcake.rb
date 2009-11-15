@@ -152,7 +152,7 @@ Capistrano::Configuration.instance(:must_exist).load do
     task :symlink, :except => { :no_release => true } do
       on_rollback do
         if previous_release
-          run "rm -f #{current_path}; ln -s #{previous_release} #{current_path}; ln -s #{shared_path}/system #{current_path}/webroot/system; ln -s #{shared_path}/tmp #{current_path}/tmptrue"
+          run "rm -f #{current_path}; ln -s #{previous_release} #{current_path}; ln -s #{shared_path}/system #{current_path}/webroot/system; ln -s #{shared_path}/tmp #{current_path}/tmp; true"
         else
           logger.important "no previous release to rollback to, rollback of symlink skipped"
         end
@@ -194,7 +194,7 @@ Capistrano::Configuration.instance(:must_exist).load do
       DESC
       task :revision, :except => { :no_release => true } do
         if previous_release
-          run "rm #{current_path}; ln -s #{previous_release} #{current_path}"
+          run "rm #{current_path}; ln -s #{previous_release} #{current_path}; ln -s #{shared_path}/system #{current_path}/webroot/system; ln -s #{shared_path}/tmp #{current_path}/tmp"
         else
           abort "could not rollback the code because there is no prior release"
         end
