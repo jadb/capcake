@@ -83,16 +83,16 @@ Finally, deploy:
 
 Which will change the directory structure to become:
 
-[deploy_to]
-[deploy_to]/current -> [deploy_to]/releases/20091013001122
-[deploy_to]/releases
-[deploy_to]/releases/20091013001122
-[deploy_to]/releases/20091013001122/system -> [deploy_to]/shared/system
-[deploy_to]/releases/20091013001122/tmp -> [deploy_to]/shared/tmp
-[deploy_to]/shared
-[deploy_to]/shared/cakephp
-[deploy_to]/shared/system
-[deploy_to]/shared/tmp
+	[deploy_to]
+	[deploy_to]/current -> [deploy_to]/releases/20091013001122
+	[deploy_to]/releases
+	[deploy_to]/releases/20091013001122
+	[deploy_to]/releases/20091013001122/system -> [deploy_to]/shared/system
+	[deploy_to]/releases/20091013001122/tmp -> [deploy_to]/shared/tmp
+	[deploy_to]/shared
+	[deploy_to]/shared/cakephp
+	[deploy_to]/shared/system
+	[deploy_to]/shared/tmp
 
 ## Bugs & Feedback
 
