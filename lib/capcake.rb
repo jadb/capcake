@@ -44,7 +44,8 @@ Capistrano::Configuration.instance(:must_exist).load do
 
   def capcake()
     set :deploy_to, "/var/www/#{application}" if (deploy_to.empty?)
-    set(:shared_path)         { File.join(deploy_to, "shared") }
+    set(:current_path)        { File.join(deploy_to, current_dir) }
+    set(:shared_path)         { File.join(deploy_to, shared_dir) }
     _cset(:cake_path)         { shared_path }
     _cset(:tmp_path)          { File.join(shared_path, "tmp") }
     _cset(:cache_path)        { File.join(tmp_path, "cache") }
