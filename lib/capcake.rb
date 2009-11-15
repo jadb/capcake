@@ -317,14 +317,34 @@ Capistrano::Configuration.instance(:must_exist).load do
     end
 
     namespace :cake do
+      desc <<-DESC
+        Prepares server for deployment of a CakePHP application. \
+
+        By default, it will clone the CakePHP repository inside #{shared_path}/cakephp \
+        and run deploy:cake:update.
+
+        Further customization will require that you write your own task.
+      DESC
       desc "Prepares server for deployment of a CakePHP application"
       task :setup do
         run "cd #{cake_path} && git clone #{cake_repo}"
         set :git_flag_quiet, "-q "
         update
       end
-      desc "Force installed CakePHP to checkout a new branch/tag"
+      desc <<-DESC
+        Force CakePHP installation to checkout a new branch/tag. \
+
+        By default, it will checkout the :cake_branch you set in \
+        deploy.rb, but you can change that on runtime by specifying \
+        the BRANCH environment variable:
+
+          $ cap deploy:cake:update \\
+                BRANCH="1.3.0-alpha"
+
+        Further customization will require that you write your own task.
+      DESC
       task :update do
+        cake_branch = ENV['BRANCH'] ? ENV['BRANCH'] : cake_branch
         run "cd #{cake_path}/cakephp && git checkout #{git_flag_quiet}#{cake_branch}"
       end
     end
