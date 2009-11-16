@@ -477,12 +477,13 @@ Capistrano::Configuration.instance(:must_exist).load do
         _cset :db_name, defaults(Capistrano::CLI.ui.ask("db name [#{application}]:"), application)
         _cset :db_prefix, Capistrano::CLI.ui.ask("prefix:")
         _cset :db_persistent, defaults(Capistrano::CLI.ui.ask("persistent [false]:"), 'false')
-        _cset :db_encoding, defaults(Capistrano::CLI.ui.ask("encoding [utf-8]:"), 'utf-8')
+        _cset :db_encoding, defaults(Capistrano::CLI.ui.ask("encoding [utf8]:"), 'utf8')
 
         template = File.read(File.join(File.dirname(__FILE__), "templates", "database.rphp"))
         result = ERB.new(template).result(binding)
 
         put(result, "#{database_path}", :mode => 0644, :via => :scp)
+        after("deploy:symlink", "cake:database:symlink")
       end
       desc <<-DESC
         Creates MySQL database, database user and grants permissions on DB servers
