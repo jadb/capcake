@@ -485,10 +485,31 @@ Capistrano::Configuration.instance(:must_exist).load do
         put(result, "#{database_path}", :mode => 0644, :via => :scp)
       end
       desc <<-DESC
-        Creates MySQL database on DB servers
+        Creates MySQL database, database user and grants permissions on DB servers
       DESC
       task :create, :roles => :db, :except => { :no_releases => true } do
-        # ...
+        require 'erb'
+
+        _cset :mysql_admin_user, defaults(Capistrano::CLI.ui.ask("username [root]:"), 'root')
+        _cset :mysql_admin_password, Capistrano::CLI.password_prompt("password:")
+
+        _cset :mysql_grant_priv_type, defaults(Capistrano::CLI.ui.ask("Grant privilege types:"), 'ALL')
+        _cset :mysql_grant_locations, defaults(Capistrano::CLI.ui.ask("Grant locations:"), ["localhost"])
+
+        _cset :db_login, defaults(Capistrano::CLI.ui.ask("username [#{user}]:"), user)
+        _cset :db_password, Capistrano::CLI.password_prompt("password:")
+        _cset :db_name, defaults(Capistrano::CLI.ui.ask("db name [#{application}]:"), application)
+        _cset :db_encoding, defaults(Capistrano::CLI.ui.ask("encoding [utf8]:"), 'utf8')
+
+        set :tmp_filename, File.join(shared_path, "config/create_db_#{db_name}.sql") 
+
+        template = File.read(File.join(File.dirname(__FILE__), "templates", "create_database.rsql"))
+        result = ERB.new(template).result(binding)
+
+        put(result, "#{tmp_filename}", :mode => 0644, :via => :scp)
+
+        run "mysql -u #{mysql_admin_user} -p#{mysql_admin_password} < #{tmp_filename}"
+        run "#{try_sudo} rm #{tmp_filename}"
       end
       desc <<-DESC
         Creates database tables on primary DB servers

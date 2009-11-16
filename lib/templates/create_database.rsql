@@ -1,0 +1,6 @@
+<% mysql_grant_locations.each do |location| %>GRANT <%= mysql_grant_priv_type %> ON <%= db_name %>.* TO '<%= db_login %>'@'<%= location %>' IDENTIFIED BY '<%= db_password %>';
+<% end %>
+
+CREATE DATABASE IF NOT EXISTS <%= db_name %> CHARACTER SET = <%= db_encoding %>;
+
+FLUSH PRIVILEGES;
