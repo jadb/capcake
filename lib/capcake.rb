@@ -402,14 +402,17 @@ Capistrano::Configuration.instance(:must_exist).load do
     desc <<-DESC
       Prepares server for deployment of a CakePHP application. \
 
-      By default, it will clone the CakePHP repository inside #{shared_path}/cakephp \
-      and run deploy:cake:update.
+      By default, it will create a shallow clone of the CakePHP repository \
+      inside #{shared_path}/cakephp and run deploy:cake:update.
+
+      For more info about shallow clones: \
+      http://www.kernel.org/pub/software/scm/git/docs/git-clone.html \
 
       Further customization will require that you write your own task.
     DESC
     desc "Prepares server for deployment of a CakePHP application"
     task :setup do
-      stream "cd #{cake_path} && git clone #{cake_repo}"
+      run "cd #{cake_path} && git clone --depth 1 #{cake_repo}"
       set :git_flag_quiet, "-q "
       update
     end
