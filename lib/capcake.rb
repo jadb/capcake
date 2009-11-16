@@ -52,13 +52,17 @@ Capistrano::Configuration.instance(:must_exist).load do
     _cset(:cache_path)        { File.join(tmp_path, "cache") }
     _cset(:logs_path)         { File.join(tmp_path, "logs") }
 
-    after("deploy:setup", "cake:database:config") if (!File.exists?(database_path))
-    after("deploy:symlink", "cake:database:symlink") if (File.exists?(database_path))
+    after("deploy:setup", "cake:database:config") if (!remote_file_exists?(database_path))
+    after("deploy:symlink", "cake:database:symlink") if (remote_file_exists?(database_path))
   end
 
   def defaults(val, default)
     val = default if (val.empty?)
     val
+  end
+
+  def remote_file_exists?(full_path)
+    'true' ==  capture("if [ -e #{full_path} ]; then echo 'true'; fi").strip
   end
 
   # =========================================================================
