@@ -37,7 +37,7 @@ Capistrano::Configuration.instance(:must_exist).load do
   set :git_flag_quiet,        ""
 
   _cset(:cake_branch)         { "" }
-  _cset(:cake_repo)           { "dev@code.cakephp.org:cakephp.git" }
+  _cset(:cake_repo)           { "http://github.com/cakephp/cakephp1x.git" }
   _cset :tmp_children,        %w(cache logs sessions tests)
   _cset :cache_children,      %w(models persistent views)
   _cset :logs_files,          %w(debug error)
@@ -412,7 +412,7 @@ Capistrano::Configuration.instance(:must_exist).load do
     DESC
     desc "Prepares server for deployment of a CakePHP application"
     task :setup do
-      run "cd #{cake_path} && git clone --depth 1 #{cake_repo}"
+      run "cd #{cake_path} && git clone --depth 1 #{cake_repo} cakephp"
       set :git_flag_quiet, "-q "
       update
     end
