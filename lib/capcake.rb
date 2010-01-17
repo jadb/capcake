@@ -471,6 +471,7 @@ Capistrano::Configuration.instance(:must_exist).load do
         require 'erb'
         on_rollback { run "rm #{shared_path}/system/database.php" }
         puts "Database configuration"
+        _cset :db_driver, defaults(Capistrano::CLI.ui.ask("driver [mysql]:"), 'mysql')
         _cset :db_host, defaults(Capistrano::CLI.ui.ask("hostname [localhost]:"), 'localhost')
         _cset :db_login, defaults(Capistrano::CLI.ui.ask("username [#{user}]:"), user)
         _cset :db_password, Capistrano::CLI.password_prompt("password:")
