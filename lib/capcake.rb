@@ -464,12 +464,12 @@ Capistrano::Configuration.instance(:must_exist).load do
 
     namespace :database do
       desc <<-DESC
-        Generates CakePHP database configuration file in #{shared_path}/tmp/system \
+        Generates CakePHP database configuration file in #{shared_path}/config \
         and symlinks #{current_path}/config/database.php to it
       DESC
       task :config, :roles => :web, :except => { :no_release => true } do
         require 'erb'
-        on_rollback { run "rm #{shared_path}/system/database.php" }
+        on_rollback { run "rm #{database_path}" }
         puts "Database configuration"
         _cset :db_driver, defaults(Capistrano::CLI.ui.ask("driver [mysql]:"), 'mysql')
         _cset :db_host, defaults(Capistrano::CLI.ui.ask("hostname [localhost]:"), 'localhost')
