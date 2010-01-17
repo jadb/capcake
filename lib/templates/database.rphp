@@ -1,0 +1,14 @@
+<?php
+class DATABASE_CONFIG {
+   public $default = array(
+       'driver' => '<%= db_driver %>',
+       'persistent' => '<%= db_persistent %>',
+       'host' => '<%= db_host %>',
+       'login' => '<%= db_login %>',
+       'password' => '<%= db_password %>',
+       'database' => '<%= db_name %>',
+       'prefix' => '<%= db_prefix %>',
+       'encoding' => '<%= db_encoding %>',
+    );
+}
+?>
