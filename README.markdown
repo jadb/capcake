@@ -94,6 +94,14 @@ Which will change the directory structure to become:
 	[deploy_to]/shared/system
 	[deploy_to]/shared/tmp
 
+## Patches & Features
+
+* Fork
+* Mod, fix
+* Test - this is important, so it's not unintentionally broken
+* Commit - do not mess with license, todo, version, etc. (if you do change any, make them into commits of their own that I can ignore when I pull)
+* Pull request - bonus point for topic branches
+
 ## Bugs & Feedback
 
 http://github.com/jadb/capcake/issues
