@@ -30,7 +30,6 @@ Capistrano::Configuration.instance(:must_exist).load do
 
   set :scm,                   :git
   set :git_enable_submodules, 1
-  set :revision,              source.head
   set :deploy_via,            :checkout
   set :shared_children,       %w(config system tmp)
 
