@@ -36,7 +36,7 @@ Capistrano::Configuration.instance(:must_exist).load do
   set :git_flag_quiet,        ""
 
   _cset(:cake_branch)         { "" }
-  _cset(:cake_repo)           { "https://github.com/cakephp/cakephp.git" }
+  _cset(:cake_repo)           { "git://github.com/cakephp/cakephp.git" }
   _cset :tmp_children,        %w(cache logs sessions tests)
   _cset :cache_children,      %w(models persistent views)
   _cset :logs_files,          %w(debug error)
