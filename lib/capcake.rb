@@ -46,6 +46,7 @@ Capistrano::Configuration.instance(:must_exist).load do
     set(:current_path)        { File.join(deploy_to, current_dir) }
     set(:database_path)       { File.join(File.join(shared_path, "config"), "database.php") }
     set(:shared_path)         { File.join(deploy_to, shared_dir) }
+    set(:core_config_path)    { File.join(File.join(shared_path, "config"), "core.php") }
     _cset(:cake_path)         { shared_path }
     _cset(:tmp_path)          { File.join(shared_path, "tmp") }
     _cset(:cache_path)        { File.join(tmp_path, "cache") }
@@ -174,6 +175,7 @@ Capistrano::Configuration.instance(:must_exist).load do
       end
       run "ln -s #{shared_path}/system #{latest_release}/webroot/system && ln -s #{shared_path}/tmp #{latest_release}/tmp";
       run "rm -f #{current_path} && ln -s #{latest_release} #{current_path}"
+      run "cp #{latest_release}/config/core.php #{core_config_path}" if (!remote_file_exists?(core_config_path))
     end
 
     desc <<-DESC
@@ -443,6 +445,9 @@ Capistrano::Configuration.instance(:must_exist).load do
     task :update do
       set :cake_branch, ENV['BRANCH'] if ENV.has_key?('BRANCH')
       stream "cd #{cake_path}/cakephp && git checkout #{git_flag_quiet}#{cake_branch}"
+      run "#{try_sudo} ln -s #{shared_path}/cakephp/cake #{deploy_to}/#{version_dir}/cake"
+      run "#{try_sudo} ln -s #{shared_path}/cakephp/plugins #{deploy_to}/#{version_dir}/plugins"
+      run "#{try_sudo} ln -s #{shared_path}/cakephp/vendors #{deploy_to}/#{version_dir}/vendors"
     end
 
     namespace :cache do
@@ -523,7 +528,8 @@ Capistrano::Configuration.instance(:must_exist).load do
         #{deploy_to}/shared/config/database.php
       DESC
       task :symlink, :roles => :web, :except => { :no_release => true } do
-        run "#{try_sudo} ln -s #{database_path} #{current_path}/config/database.php"
+        run "#{try_sudo} rm -f #{current_path}/config/database.php && #{try_sudo} ln -s #{database_path} #{current_path}/config/database.php"
+        run "#{try_sudo} rm -f #{current_path}/config/core.php && #{try_sudo} ln -s #{core_config_path} #{current_path}/config/core.php"
       end
     end
 
