@@ -52,8 +52,6 @@ Capistrano::Configuration.instance(:must_exist).load do
     _cset(:cache_path)        { File.join(tmp_path, "cache") }
     _cset(:logs_path)         { File.join(tmp_path, "logs") }
 
-    after("deploy:setup", "cake:database:config") if (!remote_file_exists?(database_path))
-    after("deploy:symlink", "cake:database:symlink") if (remote_file_exists?(database_path))
   end
 
   def defaults(val, default)
@@ -101,6 +99,7 @@ Capistrano::Configuration.instance(:must_exist).load do
       run "#{try_sudo} mkdir -p #{(dirs + tmp_dirs).join(' ')} && #{try_sudo} chmod -R 777 #{tmp_path}" if (!user.empty?)
       set :git_flag_quiet, "-q "
       cake.setup if (!cake_branch.empty?)
+      cake.database.config if (!remote_file_exists?(database_path))
     end
 
     desc <<-DESC
@@ -176,6 +175,7 @@ Capistrano::Configuration.instance(:must_exist).load do
       run "ln -s #{shared_path}/system #{latest_release}/webroot/system && ln -s #{shared_path}/tmp #{latest_release}/tmp";
       run "rm -f #{current_path} && ln -s #{latest_release} #{current_path}"
       run "cp #{latest_release}/config/core.php #{core_config_path}" if (!remote_file_exists?(core_config_path))
+      cake.database.symlink if (remote_file_exists?(database_path))
     end
 
     desc <<-DESC
