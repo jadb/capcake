@@ -1,0 +1,43 @@
+require 'rubygems'
+require 'capcake'
+
+set :application, "your_app_name"				# Your application name
+
+set :scm, :git
+set :repository,  "git@domain.com:path/to/repo"			# Your repository url
+set :scm_username, "username"					# Your username to log into your repository
+set :scm_passphrase, Capistrano::CLI.password_prompt("Type your ssh passphrase for user #{scm_username}: ")
+set :branch, "master"
+set :use_sudo, false
+
+set :deploy_via, :remote_cache
+set(:group_writable, false)
+
+###
+# Staging
+###
+
+task :staging do
+  set :deploy_to, "/var/www/application/staging" 		# Your staging root path
+  set :user, "user"						# Your staging user
+  set :group, "www-data"					# Your staging group
+  server "staging.example.com", :web				# Your staging server url
+end
+
+###
+# Production
+###
+
+task :production do
+  set :deploy_to, "/var/www/application/production"		# Your production root path
+  set :user, "user"						# Your production user
+  set :group, "www-data"					# Your production group
+  server "example.com", :web					# Your production server url
+end
+
+ssh_options[:forward_agent] = true
+
+set :cake_branch, " "
+
+capcake
+
