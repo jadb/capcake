@@ -62,7 +62,7 @@ You can change the default values for the following variables also:
 
 ## Alternative Easy Configuration
 
-Simply replace your deploy.rb configuration file with the one provided in the template directory and change all variables on the lines that have comments with you values.
+Simply replace your deploy.rb configuration file with the one provided in the template directory, and change all variables on the lines that have comments with your values.
 
 This configuration file is meant to work with [Multiple Stages Without Multistage Extension](https://github.com/capistrano/capistrano/wiki/2.x-Multiple-Stages-Without-Multistage-Extension) so every cap command will have to contain the stage you want to deploy to. For instance:
 
