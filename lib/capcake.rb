@@ -51,7 +51,6 @@ Capistrano::Configuration.instance(:must_exist).load do
     _cset(:tmp_path)          { File.join(shared_path, "tmp") }
     _cset(:cache_path)        { File.join(tmp_path, "cache") }
     _cset(:logs_path)         { File.join(tmp_path, "logs") }
-
   end
 
   def defaults(val, default)
