@@ -113,6 +113,7 @@ Capistrano::Configuration.instance(:must_exist).load do
       transaction do
         update_code
         symlink
+	cake.cache.clear
       end
     end
 
