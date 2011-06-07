@@ -36,11 +36,7 @@ Capistrano::Configuration.instance(:must_exist).load do
   set :git_flag_quiet,        ""
 
   _cset(:cake_branch)         { "" }
-<<<<<<< Updated upstream
-  _cset(:cake_repo)           { "git://github.com/cakephp/cakephp.git" }
-=======
   _cset(:cake_repo)	      { "git://github.com/cakephp/cakephp.git" }
->>>>>>> Stashed changes
   _cset :tmp_children,        %w(cache logs sessions tests)
   _cset :cache_children,      %w(models persistent views)
   _cset :logs_files,          %w(debug error)
@@ -49,23 +45,15 @@ Capistrano::Configuration.instance(:must_exist).load do
     set :deploy_to, "/var/www/#{application}" if (deploy_to.empty?)
     set(:current_path)        { File.join(deploy_to, current_dir) }
     set(:database_path)       { File.join(File.join(shared_path, "config"), "database.php") }
-<<<<<<< Updated upstream
-    set(:shared_path)         { File.join(deploy_to, shared_dir) }
-    set(:core_config_path)    { File.join(File.join(shared_path, "config"), "core.php") }
-=======
     set(:core_config_path)    { File.join(File.join(shared_path, "config"), "core.php") }
     set(:shared_path)         { File.join(deploy_to, shared_dir) }
->>>>>>> Stashed changes
     _cset(:cake_path)         { shared_path }
     _cset(:tmp_path)          { File.join(shared_path, "tmp") }
     _cset(:cache_path)        { File.join(tmp_path, "cache") }
     _cset(:logs_path)         { File.join(tmp_path, "logs") }
-<<<<<<< Updated upstream
-=======
 
 #    after("deploy:setup", "cake:database:config") if (!remote_file_exists?(database_path))
 #    after("deploy:symlink", "cake:database:symlink") if (remote_file_exists?(database_path))
->>>>>>> Stashed changes
   end
 
   def defaults(val, default)
@@ -461,13 +449,10 @@ Capistrano::Configuration.instance(:must_exist).load do
       set :cake_branch, ENV['BRANCH'] if ENV.has_key?('BRANCH')
       stream "cd #{cake_path}/cakephp && git checkout #{git_flag_quiet}#{cake_branch}"
       run "#{try_sudo} ln -s #{shared_path}/cakephp/cake #{deploy_to}/#{version_dir}/cake"
-<<<<<<< Updated upstream
-=======
       run "#{try_sudo} mkdir -m 777 -p #{shared_path}/cakephp/media/transfer/img"
       run "#{try_sudo} mkdir -m 777 -p #{shared_path}/cakephp/media/static"
       run "#{try_sudo} mkdir -m 777 -p #{shared_path}/cakephp/media/filter/img"
       run "#{try_sudo} ln -s #{shared_path}/cakephp/media #{deploy_to}/#{version_dir}/media"
->>>>>>> Stashed changes
       run "#{try_sudo} ln -s #{shared_path}/cakephp/plugins #{deploy_to}/#{version_dir}/plugins"
       run "#{try_sudo} ln -s #{shared_path}/cakephp/vendors #{deploy_to}/#{version_dir}/vendors"
     end
