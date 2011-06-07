@@ -60,6 +60,11 @@ You can change the default values for the following variables also:
 	set :user, "your_username"
 	set :branch, "tag"
 
+Append the following lines to your .git/info/exclude file:
+
+	.DS_Store
+	tmp/*
+
 ## Alternative Easy Configuration
 
 Simply replace your deploy.rb configuration file with the one provided in the template directory, and change all variables on the lines that have comments with your values.
