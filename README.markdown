@@ -94,6 +94,12 @@ Which will change the directory structure to become:
 	[deploy_to]/shared/system
 	[deploy_to]/shared/tmp
 
+## Credits
+
+* Jamis Buck ([Capistrano's](https://github.com/capistrano) original author)
+* [Jad Bitar](http://github.com/jadb) (capcake code)
+* [Michael Franze](http://github.com/franzem) (capcake wiki)
+
 ## Patches & Features
 
 * Fork
