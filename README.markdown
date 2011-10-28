@@ -1,4 +1,4 @@
-# capcake
+# capcake ![Project status](http://stillmaintained.com/jadb/capcake.png)
 
 Looking to deploy a [CakePHP](http://cakephp.org) application you've built? Capcake extends [Capistrano](http://capify.org), removing the *rails-ism*, replacing them by more *cake-ish* ones.
 
