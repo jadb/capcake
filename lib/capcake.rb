@@ -36,13 +36,13 @@ Capistrano::Configuration.instance(:must_exist).load do
   set :git_flag_quiet,        ""
 
   _cset(:cake_branch)         { "" }
-  _cset(:cake_repo)	      { "git://github.com/cakephp/cakephp.git" }
+  _cset(:cake_repo)	          { "git://github.com/cakephp/cakephp.git" }
   _cset :tmp_children,        %w(cache logs sessions tests)
   _cset :cache_children,      %w(models persistent views)
   _cset :logs_files,          %w(debug error)
 
   def capcake()
-    set :deploy_to, "/var/www/#{application}" if (deploy_to.empty?)
+    set :deploy_to,           "/var/www/#{application}" if (deploy_to.empty?)
     set(:current_path)        { File.join(deploy_to, current_dir) }
     set(:database_path)       { File.join(File.join(shared_path, "config"), "database.php") }
     set(:core_config_path)    { File.join(File.join(shared_path, "config"), "core.php") }
@@ -52,8 +52,6 @@ Capistrano::Configuration.instance(:must_exist).load do
     _cset(:cache_path)        { File.join(tmp_path, "cache") }
     _cset(:logs_path)         { File.join(tmp_path, "logs") }
 
-#    after("deploy:setup", "cake:database:config") if (!remote_file_exists?(database_path))
-#    after("deploy:symlink", "cake:database:symlink") if (remote_file_exists?(database_path))
   end
 
   def defaults(val, default)
@@ -73,9 +71,9 @@ Capistrano::Configuration.instance(:must_exist).load do
 
   namespace :deploy do
     desc <<-DESC
-      Deploys your project. This calls `update'. Note that \
+      Deploys your project. This calls `update`. Note that \
       this will generally only work for applications that have already been deployed \
-      once. For a "cold" deploy, you'll want to take a look at the `deploy:cold' \
+      once. For a "cold" deploy, you'll want to take a look at the `deploy:cold` \
       task, which handles the cold start specifically.
     DESC
     task :default do
@@ -84,7 +82,7 @@ Capistrano::Configuration.instance(:must_exist).load do
     desc <<-DESC
       Prepares one or more servers for deployment. Before you can use any \
       of the Capistrano deployment tasks with your project, you will need to \
-      make sure all of your servers have been prepared with `cap deploy:setup'. When \
+      make sure all of your servers have been prepared with `cap deploy:setup`. When \
       you add a new server to your cluster, you can easily run the setup task \
       on just that server by specifying the HOSTS environment variable:
 
@@ -106,10 +104,10 @@ Capistrano::Configuration.instance(:must_exist).load do
 
     desc <<-DESC
       Copies your project and updates the symlink. It does this in a \
-      transaction, so that if either `update_code' or `symlink' fail, all \
+      transaction, so that if either `update_code` or `symlink` fail, all \
       changes made to the remote servers will be rolled back, leaving your \
-      system in the same state it was in before `update' was invoked. Usually, \
-      you will want to call `deploy' instead of `update', but `update' can be \
+      system in the same state it was in before `update` was invoked. Usually, \
+      you will want to call `deploy` instead of `update`, but `update` can be \
       handy if you want to deploy, but not immediately restart your application.
     DESC
     task :update do
@@ -124,8 +122,8 @@ Capistrano::Configuration.instance(:must_exist).load do
       Copies your project to the remote servers. This is the first stage \
       of any deployment; moving your updated code and assets to the deployment \
       servers. You will rarely call this task directly, however; instead, you \
-      should call the `deploy' task (to do a complete deploy) or the `update' \
-      task (if you want to perform the `restart' task separately).
+      should call the `deploy` task (to do a complete deploy) or the `update` \
+      task (if you want to perform the `restart` task separately).
 
       You will need to make sure you set the :scm variable to the source \
       control software you are using (it defaults to :subversion), and the \
@@ -139,19 +137,8 @@ Capistrano::Configuration.instance(:must_exist).load do
     end
 
     desc <<-DESC
-      [internal] Touches up the released code. This is called by update_code \
-      after the basic deploy finishes. It assumes a Rails project was deployed, \
-      so if you are deploying something else, you may want to override this \
-      task with your own environment's requirements.
-
-      This task will make the release group-writable (if the :group_writable \
-      variable is set to true, which is the default). It will then set up \
-      symlinks to the shared directory for the log, system, and tmp/pids \
-      directories, and will lastly touch all assets in public/images, \
-      public/stylesheets, and public/javascripts so that the times are \
-      consistent (so that asset timestamping works).  This touch process \
-      is only carried out if the :normalize_asset_timestamps variable is \
-      set to true, which is the default.
+      [internal] This task will make the release group-writable (if the :group_writable \
+      variable is set to true, which is the default). 
     DESC
     task :finalize_update, :except => { :no_release => true } do
       run "chmod -R g+w #{latest_release}" if fetch(:group_writable, true)
@@ -160,12 +147,12 @@ Capistrano::Configuration.instance(:must_exist).load do
     desc <<-DESC
       Updates the symlinks to the most recently deployed version. Capistrano works \
       by putting each new release of your application in its own directory. When \
-      you deploy a new version, this task's job is to update the `current', \
-      `current/tmp', `current/webroot/system' symlinks to point at the new version. \
+      you deploy a new version, this task's job is to update the `current`, \
+      `current/tmp`, `current/webroot/system` symlinks to point at the new version. \
       
-      You will rarely need to call this task directly; instead, use the `deploy' \
-      task (which performs a complete deploy, including `restart') or the 'update' \
-      task (which does everything except `restart').
+      You will rarely need to call this task directly; instead, use the `deploy` \
+      task (which performs a complete deploy, including `restart`) or the 'update` \
+      task (which does everything except `restart`).
     DESC
     task :symlink, :except => { :no_release => true } do
       on_rollback do
@@ -230,7 +217,7 @@ Capistrano::Configuration.instance(:must_exist).load do
       end
 
       desc <<-DESC
-        Rolls back to the previously deployed version. The `current' symlink will \
+        Rolls back to the previously deployed version. The `current` symlink will \
         be updated to point at the previously deployed version, and then the \
         current release will be removed from the servers.
       DESC
@@ -241,7 +228,7 @@ Capistrano::Configuration.instance(:must_exist).load do
 
       desc <<-DESC
         Rolls back to a previous version and restarts. This is handy if you ever \
-        discover that you've deployed a lemon; `cap rollback' and you're right \
+        discover that you've deployed a lemon; `cap rollback` and you're right \
         back where you were, on the previously deployed version.
       DESC
       task :default do
@@ -275,7 +262,7 @@ Capistrano::Configuration.instance(:must_exist).load do
       Test deployment dependencies. Checks things like directory permissions, \
       necessary utilities, and so forth, reporting on the things that appear to \
       be incorrect or missing. This is good for making sure a deploy has a \
-      chance of working before you actually run `cap deploy'.
+      chance of working before you actually run `cap deploy`.
 
       You can define your own dependencies, as well, using the `depend' method:
 
@@ -311,7 +298,7 @@ Capistrano::Configuration.instance(:must_exist).load do
     end
 
     desc <<-DESC
-      Deploys and starts a `cold' application. This is useful if you have never \
+      Deploys and starts a `cold` application. This is useful if you have never \
       deployed your application before. It currently runs `deploy:setup` followed \
       by `deploy:update`. \
       (This is still an experimental feature, and is subject to change without \
@@ -324,7 +311,7 @@ Capistrano::Configuration.instance(:must_exist).load do
 
     namespace :pending do
       desc <<-DESC
-        Displays the `diff' since your last deploy. This is useful if you want \
+        Displays the `diff` since your last deploy. This is useful if you want \
         to examine what changes are about to be deployed. Note that this might \
         not be supported on all SCM's.
       DESC
@@ -420,7 +407,7 @@ Capistrano::Configuration.instance(:must_exist).load do
       Prepares server for deployment of a CakePHP application. \
 
       By default, it will create a shallow clone of the CakePHP repository \
-      inside #{shared_path}/cakephp and run deploy:cake:update.
+      inside #{shared_path}/cakephp and run `deploy:cake:update`.
 
       For more info about shallow clones: \
       http://www.kernel.org/pub/software/scm/git/docs/git-clone.html \
@@ -465,8 +452,8 @@ Capistrano::Configuration.instance(:must_exist).load do
         is renamed/removed after it was found but before it removes it, no error \
         will prompt (-ignore_readdir_race). If symlinks are found, they will not be followed
 
-        You will rarely need to call this task directly; instead, use the `deploy' \
-        task (which performs a complete deploy, including `cake:cache:clear')
+        You will rarely need to call this task directly; instead, use the `deploy` \
+        task (which performs a complete deploy, including `cake:cache:clear`)
       DESC
       task :clear, :roles => :web, :except => { :no_release => true } do
         run "#{try_sudo} find -P #{cache_path} -ignore_readdir_race -type f -name '*' -exec rm -f {} \\;"
