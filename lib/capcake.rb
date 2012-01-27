@@ -31,7 +31,7 @@ Capistrano::Configuration.instance(:must_exist).load do
   set :scm,                   :git
   set :git_enable_submodules, 1
   set :deploy_via,            :checkout
-  set :shared_children,       %w(config system tmp)
+  set :shared_children,       %w(Config System tmp)
 
   set :git_flag_quiet,        ""
 
@@ -44,8 +44,7 @@ Capistrano::Configuration.instance(:must_exist).load do
   def capcake()
     set :deploy_to,           "/var/www/#{application}" if (deploy_to.empty?)
     set(:current_path)        { File.join(deploy_to, current_dir) }
-    set(:database_path)       { File.join(File.join(shared_path, "config"), "database.php") }
-    set(:core_config_path)    { File.join(File.join(shared_path, "config"), "core.php") }
+    set(:database_path)       { File.join(File.join(shared_path, "Config"), "database.php") }
     set(:shared_path)         { File.join(deploy_to, shared_dir) }
     _cset(:cake_path)         { shared_path }
     _cset(:tmp_path)          { File.join(shared_path, "tmp") }
@@ -164,7 +163,6 @@ Capistrano::Configuration.instance(:must_exist).load do
       end
       run "ln -s #{shared_path}/system #{latest_release}/webroot/system && ln -s #{shared_path}/tmp #{latest_release}/tmp";
       run "rm -f #{current_path} && ln -s #{latest_release} #{current_path}"
-      run "cp #{latest_release}/config/core.php #{core_config_path}" if (!remote_file_exists?(core_config_path))
       cake.database.symlink if (remote_file_exists?(database_path))
     end
 
@@ -522,8 +520,7 @@ Capistrano::Configuration.instance(:must_exist).load do
         #{deploy_to}/shared/config/database.php
       DESC
       task :symlink, :roles => :web, :except => { :no_release => true } do
-        run "#{try_sudo} rm -f #{current_path}/config/database.php && #{try_sudo} ln -s #{database_path} #{current_path}/config/database.php"
-        run "#{try_sudo} rm -f #{current_path}/config/core.php && #{try_sudo} ln -s #{core_config_path} #{current_path}/config/core.php"
+        run "#{try_sudo} rm -f #{current_path}/Config/database.php && #{try_sudo} ln -s #{database_path} #{current_path}/Config/database.php"
       end
     end
 
