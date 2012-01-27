@@ -51,9 +51,7 @@ We need to tell it where to deploy, using what methods:
 
 And finally, some CakePHP related settings (if omitted, Capcake will NOT handle deploying CakePHP):
 
-	set :cake_branch, "1.3.0-alpha"
-
-For this to work, *deployer*'s SSH keys must be added to the [Chaw](http://thechaw.com/users/account).
+	set :cake_branch, " "
 
 You can change the default values for the following variables also:
 
@@ -61,6 +59,20 @@ You can change the default values for the following variables also:
 	set :cake_path, "/path/to"
 	set :user, "your_username"
 	set :branch, "tag"
+
+Append the following lines to your .git/info/exclude file:
+
+	.DS_Store
+	tmp/*
+
+## Alternative Easy Configuration
+
+Simply replace your deploy.rb configuration file with the one provided in the template directory, and change all variables on the lines that have comments with your values.
+
+This configuration file is meant to work with [Multiple Stages Without Multistage Extension](https://github.com/capistrano/capistrano/wiki/2.x-Multiple-Stages-Without-Multistage-Extension) so every cap command will have to contain the stage you want to deploy to. For instance:
+
+	$ cap staging deploy:setup
+	$ cap staging deploy
 
 ## Deployment
 
@@ -98,6 +110,7 @@ Which will change the directory structure to become:
 
 * Jamis Buck ([Capistrano's](https://github.com/capistrano) original author)
 * [Jad Bitar](http://github.com/jadb) (capcake code)
+* [damusnet](https://github.com/damusnet) (capcake code)
 * [Michael Franze](http://github.com/franzem) (capcake wiki)
 
 ## Patches & Features
