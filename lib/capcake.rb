@@ -30,14 +30,13 @@ Capistrano::Configuration.instance(:must_exist).load do
 
   set :scm,                   :git
   set :git_enable_submodules, 1
-  set :revision,              source.head
   set :deploy_via,            :checkout
   set :shared_children,       %w(config system tmp)
 
   set :git_flag_quiet,        ""
 
   _cset(:cake_branch)         { "" }
-  _cset(:cake_repo)           { "http://github.com/cakephp/cakephp.git" }
+  _cset(:cake_repo)	      { "git://github.com/cakephp/cakephp.git" }
   _cset :tmp_children,        %w(cache logs sessions tests)
   _cset :cache_children,      %w(models persistent views)
   _cset :logs_files,          %w(debug error)
@@ -46,14 +45,15 @@ Capistrano::Configuration.instance(:must_exist).load do
     set :deploy_to, "/var/www/#{application}" if (deploy_to.empty?)
     set(:current_path)        { File.join(deploy_to, current_dir) }
     set(:database_path)       { File.join(File.join(shared_path, "config"), "database.php") }
+    set(:core_config_path)    { File.join(File.join(shared_path, "config"), "core.php") }
     set(:shared_path)         { File.join(deploy_to, shared_dir) }
     _cset(:cake_path)         { shared_path }
     _cset(:tmp_path)          { File.join(shared_path, "tmp") }
     _cset(:cache_path)        { File.join(tmp_path, "cache") }
     _cset(:logs_path)         { File.join(tmp_path, "logs") }
 
-    after("deploy:setup", "cake:database:config") if (!remote_file_exists?(database_path))
-    after("deploy:symlink", "cake:database:symlink") if (remote_file_exists?(database_path))
+#    after("deploy:setup", "cake:database:config") if (!remote_file_exists?(database_path))
+#    after("deploy:symlink", "cake:database:symlink") if (remote_file_exists?(database_path))
   end
 
   def defaults(val, default)
@@ -101,6 +101,7 @@ Capistrano::Configuration.instance(:must_exist).load do
       run "#{try_sudo} mkdir -p #{(dirs + tmp_dirs).join(' ')} && #{try_sudo} chmod -R 777 #{tmp_path}" if (!user.empty?)
       set :git_flag_quiet, "-q "
       cake.setup if (!cake_branch.empty?)
+      cake.database.config if (!remote_file_exists?(database_path))
     end
 
     desc <<-DESC
@@ -115,6 +116,7 @@ Capistrano::Configuration.instance(:must_exist).load do
       transaction do
         update_code
         symlink
+	cake.cache.clear
       end
     end
 
@@ -175,6 +177,8 @@ Capistrano::Configuration.instance(:must_exist).load do
       end
       run "ln -s #{shared_path}/system #{latest_release}/webroot/system && ln -s #{shared_path}/tmp #{latest_release}/tmp";
       run "rm -f #{current_path} && ln -s #{latest_release} #{current_path}"
+      run "cp #{latest_release}/config/core.php #{core_config_path}" if (!remote_file_exists?(core_config_path))
+      cake.database.symlink if (remote_file_exists?(database_path))
     end
 
     desc <<-DESC
@@ -444,6 +448,13 @@ Capistrano::Configuration.instance(:must_exist).load do
     task :update do
       set :cake_branch, ENV['BRANCH'] if ENV.has_key?('BRANCH')
       stream "cd #{cake_path}/cakephp && git checkout #{git_flag_quiet}#{cake_branch}"
+      run "#{try_sudo} ln -s #{shared_path}/cakephp/cake #{deploy_to}/#{version_dir}/cake"
+      run "#{try_sudo} mkdir -m 777 -p #{shared_path}/cakephp/media/transfer/img"
+      run "#{try_sudo} mkdir -m 777 -p #{shared_path}/cakephp/media/static/img"
+      run "#{try_sudo} mkdir -m 777 -p #{shared_path}/cakephp/media/filter"
+      run "#{try_sudo} ln -s #{shared_path}/cakephp/media #{deploy_to}/#{version_dir}/media"
+      run "#{try_sudo} ln -s #{shared_path}/cakephp/plugins #{deploy_to}/#{version_dir}/plugins"
+      run "#{try_sudo} ln -s #{shared_path}/cakephp/vendors #{deploy_to}/#{version_dir}/vendors"
     end
 
     namespace :cache do
@@ -524,7 +535,8 @@ Capistrano::Configuration.instance(:must_exist).load do
         #{deploy_to}/shared/config/database.php
       DESC
       task :symlink, :roles => :web, :except => { :no_release => true } do
-        run "#{try_sudo} ln -s #{database_path} #{current_path}/config/database.php"
+        run "#{try_sudo} rm -f #{current_path}/config/database.php && #{try_sudo} ln -s #{database_path} #{current_path}/config/database.php"
+        run "#{try_sudo} rm -f #{current_path}/config/core.php && #{try_sudo} ln -s #{core_config_path} #{current_path}/config/core.php"
       end
     end
 
