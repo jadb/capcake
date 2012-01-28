@@ -28,10 +28,10 @@ Capistrano::Configuration.instance(:must_exist).load do
   # changes if you do decide to muck with these!
   # =========================================================================
 
+  set :cake2,                 true
   set :scm,                   :git
   set :git_enable_submodules, 1
   set :deploy_via,            :checkout
-  set :shared_children,       %w(Config System tmp)
 
   set :git_flag_quiet,        ""
 
@@ -44,7 +44,14 @@ Capistrano::Configuration.instance(:must_exist).load do
   def capcake()
     set :deploy_to,           "/var/www/#{application}" if (deploy_to.empty?)
     set(:current_path)        { File.join(deploy_to, current_dir) }
-    set(:database_path)       { File.join(File.join(shared_path, "Config"), "database.php") }
+    if cake2
+      set :shared_children,       %w(Config System tmp)
+      set :database_partial_path, "Config/database.php"
+    else
+      set :shared_children,       %w(config system tmp)
+      set :database_partial_path, "config/database.php"
+    end
+    set(:database_path)       { File.join(shared_path, database_partial_path) }
     set(:shared_path)         { File.join(deploy_to, shared_dir) }
     _cset(:cake_path)         { shared_path }
     _cset(:tmp_path)          { File.join(shared_path, "tmp") }
@@ -433,7 +440,11 @@ Capistrano::Configuration.instance(:must_exist).load do
     task :update do
       set :cake_branch, ENV['BRANCH'] if ENV.has_key?('BRANCH')
       stream "cd #{cake_path}/cakephp && git checkout #{git_flag_quiet}#{cake_branch}"
-      run "#{try_sudo} ln -s #{shared_path}/cakephp/cake #{deploy_to}/#{version_dir}/cake"
+      if cake2
+        run "#{try_sudo} ln -s #{shared_path}/cakephp/lib/Cake #{deploy_to}/#{version_dir}/Cake"
+      else
+        run "#{try_sudo} ln -s #{shared_path}/cakephp/cake #{deploy_to}/#{version_dir}/cake"
+      end
       run "#{try_sudo} mkdir -m 777 -p #{shared_path}/cakephp/media/transfer/img"
       run "#{try_sudo} mkdir -m 777 -p #{shared_path}/cakephp/media/static/img"
       run "#{try_sudo} mkdir -m 777 -p #{shared_path}/cakephp/media/filter"
@@ -520,7 +531,7 @@ Capistrano::Configuration.instance(:must_exist).load do
         #{deploy_to}/shared/config/database.php
       DESC
       task :symlink, :roles => :web, :except => { :no_release => true } do
-        run "#{try_sudo} rm -f #{current_path}/Config/database.php && #{try_sudo} ln -s #{database_path} #{current_path}/Config/database.php"
+        run "#{try_sudo} rm -f #{current_path}/#{database_partial_path} && #{try_sudo} ln -s #{database_path} #{current_path}/#{database_partial_path}"
       end
     end
 
