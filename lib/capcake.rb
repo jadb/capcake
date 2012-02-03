@@ -168,6 +168,7 @@ Capistrano::Configuration.instance(:must_exist).load do
           logger.important "no previous release to rollback to, rollback of symlink skipped"
         end
       end
+      run "rm -rf #{latest_release}/tmp" if (!remote_file_exists?("#{latest_release}/tmp/empty"))
       run "ln -s #{shared_path}/system #{latest_release}/webroot/system && ln -s #{shared_path}/tmp #{latest_release}/tmp";
       run "rm -f #{current_path} && ln -s #{latest_release} #{current_path}"
       cake.database.symlink if (remote_file_exists?(database_path))
