@@ -441,7 +441,7 @@ Capistrano::Configuration.instance(:must_exist).load do
       set :cake_branch, ENV['BRANCH'] if ENV.has_key?('BRANCH')
       stream "cd #{cake_path}/cakephp && git checkout #{git_flag_quiet}#{cake_branch}"
       if cake2
-        run "#{try_sudo} ln -s #{shared_path}/cakephp/lib/Cake #{deploy_to}/#{version_dir}/Cake"
+        run "#{try_sudo} ln -s #{shared_path}/cakephp/lib #{deploy_to}/#{version_dir}/lib"
       else
         run "#{try_sudo} ln -s #{shared_path}/cakephp/cake #{deploy_to}/#{version_dir}/cake"
       end
@@ -478,7 +478,13 @@ Capistrano::Configuration.instance(:must_exist).load do
         require 'erb'
         on_rollback { run "rm #{database_path}" }
         puts "Database configuration"
-        _cset :db_driver, defaults(Capistrano::CLI.ui.ask("driver [mysql]:"), 'mysql')
+        if cake2
+          set :db_driver_or_datasource, 'datasource'
+          _cset :db_driver_or_datasource_value, defaults(Capistrano::CLI.ui.ask("datasource [Database/Mysql]:"), 'Database/Mysql')
+        else
+          set :db_driver_or_datasource, 'driver'
+          _cset :db_driver_or_datasource_value, defaults(Capistrano::CLI.ui.ask("driver [mysql]:"), 'mysql')
+        end
         _cset :db_host, defaults(Capistrano::CLI.ui.ask("hostname [localhost]:"), 'localhost')
         _cset :db_login, defaults(Capistrano::CLI.ui.ask("username [#{user}]:"), user)
         _cset :db_password, Capistrano::CLI.password_prompt("password:")

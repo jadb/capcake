@@ -1,7 +1,7 @@
 <?php
 class DATABASE_CONFIG {
    public $default = array(
-       'driver' => '<%= db_driver %>',
+       '<%= db_driver_or_datasource %>' => '<%= db_driver_or_datasource_value %>',
        'persistent' => '<%= db_persistent %>',
        'host' => '<%= db_host %>',
        'login' => '<%= db_login %>',
