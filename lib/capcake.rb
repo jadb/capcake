@@ -503,7 +503,7 @@ Capistrano::Configuration.instance(:must_exist).load do
       desc <<-DESC
         Creates MySQL database, database user and grants permissions on DB servers
       DESC
-      task :create, :roles => :db, :except => { :no_releases => true } do
+      task :create, :roles => :db, :except => { :no_release => true } do
         require 'erb'
 
         _cset :mysql_admin_user, defaults(Capistrano::CLI.ui.ask("username [root]:"), 'root')
@@ -530,7 +530,7 @@ Capistrano::Configuration.instance(:must_exist).load do
       desc <<-DESC
         Creates database tables on primary DB servers
       DESC
-      task :schema, :roles => :db, :primary => true, :except => { :no_releases => true } do
+      task :schema, :roles => :db, :primary => true, :except => { :no_release => true } do
         # ...
       end
       desc <<-DESC
