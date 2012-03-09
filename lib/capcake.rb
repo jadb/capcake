@@ -47,11 +47,14 @@ Capistrano::Configuration.instance(:must_exist).load do
     if cake2
       set :shared_children,       %w(Config System tmp)
       set :database_partial_path, "Config/database.php"
+      set :core_partial_path,     "Config/core.php"
     else
       set :shared_children,       %w(config system tmp)
       set :database_partial_path, "config/database.php"
+      set :core_partial_path,     "config/core.php"
     end
     set(:database_path)       { File.join(shared_path, database_partial_path) }
+    set(:core_path)           { File.join(shared_path, core_partial_path) }
     set(:shared_path)         { File.join(deploy_to, shared_dir) }
     _cset(:cake_path)         { shared_path }
     _cset(:tmp_path)          { File.join(shared_path, "tmp") }
@@ -106,6 +109,7 @@ Capistrano::Configuration.instance(:must_exist).load do
       set :git_flag_quiet, "-q "
       cake.setup if (!cake_branch.empty?)
       cake.database.config if (!remote_file_exists?(database_path))
+      cake.core.config if (!remote_file_exists?(core_path))
     end
 
     desc <<-DESC
@@ -120,7 +124,7 @@ Capistrano::Configuration.instance(:must_exist).load do
       transaction do
         update_code
         symlink
-	cake.cache.clear
+      	cake.cache.clear
       end
     end
 
@@ -172,6 +176,7 @@ Capistrano::Configuration.instance(:must_exist).load do
       run "ln -s #{shared_path}/system #{latest_release}/webroot/system && ln -s #{shared_path}/tmp #{latest_release}/tmp";
       run "rm -f #{current_path} && ln -s #{latest_release} #{current_path}"
       cake.database.symlink if (remote_file_exists?(database_path))
+      cake.core.symlink if (remote_file_exists?(core_path))
     end
 
     desc <<-DESC
@@ -500,6 +505,7 @@ Capistrano::Configuration.instance(:must_exist).load do
         put(result, "#{database_path}", :mode => 0644, :via => :scp)
         after("deploy:symlink", "cake:database:symlink")
       end
+
       desc <<-DESC
         Creates MySQL database, database user and grants permissions on DB servers
       DESC
@@ -527,18 +533,48 @@ Capistrano::Configuration.instance(:must_exist).load do
         run "mysql -u #{mysql_admin_user} -p#{mysql_admin_password} < #{tmp_filename}"
         run "#{try_sudo} rm #{tmp_filename}"
       end
+
       desc <<-DESC
         Creates database tables on primary DB servers
       DESC
       task :schema, :roles => :db, :primary => true, :except => { :no_release => true } do
         # ...
       end
+
       desc <<-DESC
         Creates required CakePHP's APP/config/database.php as a symlink to \
         #{deploy_to}/shared/config/database.php
       DESC
       task :symlink, :roles => :web, :except => { :no_release => true } do
         run "#{try_sudo} rm -f #{current_path}/#{database_partial_path} && #{try_sudo} ln -s #{database_path} #{current_path}/#{database_partial_path}"
+      end
+    end
+
+    namespace :core do
+      desc <<-DESC
+        Force updates CakePHP core configuration file with the latest deployed
+      DESC
+      task :reset, :roles => :web, :except => { :no_release => true } do
+        run "#{try_sudo} rm -f #{core_path}" if (remote_file_exists?(core_path))
+        cake.core.config
+      end
+
+      desc <<-DESC
+        Generates CakePHP core configuration file in #{shared_path}/config \
+        as a copy of the latest #{current_path}/config/core.php \
+        and symlinks #{current_path}/config/core.php to it
+      DESC
+      task :config, :roles => :web, :except => { :no_release => true } do
+        run "cp -p #{current_path}/#{core_partial_path} #{core_path}" if (!remote_file_exists?(core_path))
+        cake.core.symlink
+      end
+
+      desc <<-DESC
+        Creates required CakePHP's APP/config/core.php as a symlink to \
+        #{deploy_to}/shared/config/core.php
+      DESC
+      task :symlink, :roles => :web, :except => { :no_release => true } do
+        run "#{try_sudo} rm -f #{current_path}/#{core_partial_path} && #{try_sudo} ln -s #{core_path} #{current_path}/#{core_partial_path}"
       end
     end
 
