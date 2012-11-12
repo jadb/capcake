@@ -498,7 +498,7 @@ Capistrano::Configuration.instance(:must_exist).load do
         result = ERB.new(template).result(binding)
 
         put(result, "#{database_path}", :mode => 0644, :via => :scp)
-        after("deploy:symlink", "cake:database:symlink")
+        after("deploy:create_symlink", "cake:database:symlink")
       end
       desc <<-DESC
         Creates MySQL database, database user and grants permissions on DB servers
