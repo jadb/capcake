@@ -4,14 +4,6 @@ Deploy CakePHP applications with Capistrano v3.*
 
 IMPORTANT: Tested with CakePHP 3 thus far, but should work for CakePHP 2 that uses composer.
 
-## Requirements
-
-The remote server(s) require the `acl` package:
-
-```
-$ sudo apt-get install acl
-```
-
 ## Installation
 
 Add this line to your application's Gemfile:
