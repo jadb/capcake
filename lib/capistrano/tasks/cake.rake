@@ -14,12 +14,4 @@ namespace :cakephp do
     end
   end
 
-  task :build do
-    on roles fetch(:cakephp_roles) do
-      within release_path do
-        execute :composer, "install --no-dev"
-      end
-    end
-  end
-  
 end

@@ -7,7 +7,3 @@ namespace :load do
     load 'capistrano/cakephp/defaults.rb'
   end
 end
-
-namespace :deploy do
-  after :updated, "cakephp:build"
-end
