@@ -32,7 +32,9 @@ namespace :deploy do
       invoke "cakephp:migrations", "rollback"
     end
   end
+end
 
+namespace :cakephp do
   task :migrations, :command_name do |t, args|
     # ask only runs if argument is not provided
     ask(:cmd, "list")
