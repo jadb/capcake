@@ -9,7 +9,7 @@ namespace :cakephp do
 
     on roles fetch(:cakephp_roles) do
       within release_path do
-        execute :php, :cake, command, *args.extras, fetch(:cakephp_cake_options)
+        execute "bin/cake", command, *args.extras, fetch(:cakephp_cake_options)
       end
     end
   end
