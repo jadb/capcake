@@ -6,6 +6,7 @@ set_if_empty :linked_dirs, [
   'tmp/cache/models',
   'tmp/cache/persistent',
   'tmp/cache/views',
+  'tmp/logs',
   'tmp/sessions',
   'tmp/tests'
 ]
