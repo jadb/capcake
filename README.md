@@ -1,5 +1,7 @@
 # Capistrano::cakephp
 
+[![Project Status](https://stillmaintained.com/jadb/capcake.svg)](https://stillmaintained.com/jadb/capcake)
+
 Deploy CakePHP applications with Capistrano v3.*
 
 IMPORTANT: Tested with CakePHP 3 thus far, but should work for CakePHP 2 that uses composer.
