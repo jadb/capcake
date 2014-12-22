@@ -3,10 +3,10 @@ set_if_empty :cakephp_flags, ''
 set_if_empty :cakephp_user, :local_user
 
 set_if_empty :linked_dirs, [
+  'logs',
   'tmp/cache/models',
   'tmp/cache/persistent',
   'tmp/cache/views',
-  'tmp/logs',
   'tmp/sessions',
   'tmp/tests'
 ]
