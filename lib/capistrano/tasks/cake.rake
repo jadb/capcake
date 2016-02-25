@@ -8,7 +8,7 @@ namespace :cakephp do
     command = args[:command_name] || fetch(:cmd)
 
     on roles fetch(:cakephp_roles) do
-      within release_path do
+      within fetch(:cakephp_working_dir) do
         execute "bin/cake", command, *args.extras, fetch(:cakephp_cake_options)
       end
     end
